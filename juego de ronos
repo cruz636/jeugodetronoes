@@ -1,0 +1,123 @@
+class Personaje{
+	var casa
+	var estado
+	var conyugues = []
+	var acompanantes = []
+	var aliados = []
+	
+	constructor(_casa,_estado){
+	
+		casa = _casa
+		estado =  _estado
+		casa.agregarMiembro(self)
+	}
+	
+	method puedeCasarseCon(pareja)=	casa.puedeCasarse(self,pareja)
+	
+	method acompanantes()=acompanantes
+	method acompanantes(_acompanantes)= acompanantes.add(_acompanantes)
+	
+	method estaSolo()= self.acompanantes().size() == 0
+	
+	
+	method aliados(){
+		aliados.add(self.acompanantes())
+		aliados.add(self.conyugues())
+		aliados.add(self.casa().miembros())
+		return aliados.flatten()
+		}
+	
+	method casa()=casa
+	method conyugues() = conyugues
+	
+	method casamientoPermitido(pareja){
+		if(casa.puedeCasarse(self,pareja)&&
+		pareja.casa().puedeCasarse(pareja,self)){
+			return true
+			
+		} else{
+			return 1
+		}
+		
+	}
+	
+	method casarCon(pareja){
+		if(self.casamientoPermitido(pareja)){
+			conyugues.add(pareja)
+			pareja.conyugues().add(self)
+		}else{
+			throw new NoSePuedenCasar()
+		}
+	}
+	
+	method patrimonio() = casa.patrimonioIndividual()
+	
+	
+	method estado(_estado){estado = _estado}
+	method estado()= estado
+	
+	method condiciones() = (self.aliados().sum({aliado => aliado.patrimonio()}) > 10000) or (self.conyugues().all({conyugue => conyugue.casa().esRica()})) or (self.aliados().any({aliado => aliado.esPeligroso()}))
+	
+	
+	method esPeligroso()= self.estado() =="vivo" && self.condiciones()
+			
+		
+	
+		
+}
+
+
+class Acompanante{
+	var tipo
+	var patrimonio = 0
+	
+	constructor(_tipo){
+		tipo = _tipo
+	}
+	
+	method esPeligroso()= tipo == "dragon" or tipo=="huargo"
+	
+	method patrimonio()=patrimonio
+}
+
+
+
+
+class Casa{
+	var patrimonio
+	var ciudadPrincipal
+	var miembros = []
+	
+	method puedeCasarse(yo,pareja) = false
+	method patrimonio(_patrimonio){patrimonio = _patrimonio}
+	method patrimonio()=patrimonio
+	method ciudadPrincipal(_ciudad){ciudadPrincipal = _ciudad}
+	
+	method miembros()=miembros
+	
+	method esRica() = self.patrimonio() > 1000
+	
+	method patrimonioIndividual()= self.patrimonio() / self.miembros().size()
+	
+	method agregarMiembro(_personaje){
+		miembros.add(_personaje)
+	}
+	
+}
+
+
+object lannister inherits Casa{
+	override method puedeCasarse(yo,pareja)= yo.conyugues().size() == 0
+	
+}
+
+object stark inherits Casa{
+	override method puedeCasarse(yo,pareja)= yo.casa() != pareja.casa()
+}
+
+object guardiaNocturna inherits Casa{
+	
+}
+
+
+class NoSePuedenCasar{}
