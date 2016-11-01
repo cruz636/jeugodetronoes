@@ -1,0 +1,37 @@
+#conspiracion
+>>conspiracionValida()=victima.esPeligroso()
+>>traidores() = (complotados.filter({complotado=>complotado.esAliado(victima)})).size()
+
+#Personaje
+>>esAliado(otroPersonaje)=aliados.contains(otroPersonaje)
+
+#conspiracion
+>>ejecutar()=complotados.map({complotado => complotado.mision(self.victima)})
+
+#sutil
+
+>>mision(victima)=victima.casarCon(solteroPobre())
+>>casaMasPobre()=casas.min({casa => casa.patrimonio})
+>>solteroPobre()=head((casaMasPobre().miembros()).filter({pobre => pobre.estaSolo()}))
+
+#Asesino
+>> mision(victima) = victima.estado("muerto")
+
+#Personaje
+
+>> estado(_estado) {estado = _estado}
+
+#AsesinoPrecavido
+
+>> mision(victima){if(vicitima.estaSolo()){
+	victima.estado("muerto")
+}}
+
+#disipado
+>> mision(victima) = victima.casa().perderPatrimonio(dineroARobar)
+
+#Casa
+>>perderPatrimonio(cantidad){patrimonio -=cantidad}
+
+#conspiracion
+>>objetivoCumplido(victima)=not(victima.esPeligroso())
